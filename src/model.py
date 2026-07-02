@@ -10,6 +10,9 @@ nach dem TFLite-Export auch auf dem Gerät identisch angewendet wird.
 """
 from __future__ import annotations
 
+import os
+os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")  # Keras-2-Verhalten unter TF>=2.16
+
 from typing import Any
 
 import tensorflow as tf

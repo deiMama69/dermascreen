@@ -1,5 +1,6 @@
 # Kern
-tensorflow==2.15.0          # enthält Keras 2 + TFLite-Converter
+tensorflow==2.17.1          # Wheels für aktuelles Colab-Python (3.12) UND lokal 3.11
+tf-keras==2.17.0            # reaktiviert Keras-2-Verhalten (via TF_USE_LEGACY_KERAS=1)
 numpy>=1.24,<2.0
 pandas>=2.0
 scikit-learn>=1.3
