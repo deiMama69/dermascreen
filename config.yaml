@@ -1,0 +1,72 @@
+# Zentrale Konfiguration für die gesamte Pipeline.
+# Alle Skripte lesen diese Datei via --config config.yaml.
+
+paths:
+  raw_dir: "data/raw"                 # heruntergeladene Rohbilder
+  metadata_csv: "data/raw/metadata.csv"        # komplette ISIC-Metadaten
+  filtered_csv: "data/raw/metadata_filtered.csv"  # nach Fitzpatrick + klinisch gefiltert
+  splits_dir: "data/splits"          # train/val/test-Manifeste (CSV)
+  models_dir: "models"               # gespeicherte Keras-/TFLite-Modelle
+
+isic:
+  # Öffentliche ISIC-API (v2). Ein kostenloser Account erhöht das Download-Limit.
+  api_base: "https://api.isic-archive.com/api/v2"
+  page_limit: 100                    # Einträge pro API-Seite
+  max_images: 100000                 # Sicherheits-Obergrenze für den Download
+  # Optionaler API-Key/Token (leer lassen für anonymen Zugriff mit Limit)
+  token: ""
+
+filter:
+  # Fitzpatrick-Hauttypen, die behalten werden (helle Haut).
+  fitzpatrick_keep: ["I", "II", "III"]
+  # Nur klinische Makroaufnahmen behalten – dermatoskopische verwerfen.
+  # ISIC-Feld image_type: "clinical: close-up", "clinical: overview", "dermoscopic"
+  image_type_keep_substring: "clinical"
+  # Feld, das benigne/maligne kodiert.
+  label_field: "benign_malignant"
+  malignant_values: ["malignant"]
+  benign_values: ["benign"]
+
+split:
+  test_size: 0.15
+  val_size: 0.15                     # Anteil des verbleibenden Trainings
+  group_field: "patient_id"          # Split auf Patientenebene -> kein Leakage
+  random_state: 42
+
+data:
+  img_size: 224                      # 224 für B0, 380 für B4
+  batch_size: 16                     # 16 = schonend für 16 GB RAM / CPU-Training
+  # Augmentation zur Simulation von Alltags-/Smartphone-Bedingungen
+  aug:
+    rotation_deg: 25
+    zoom: 0.15
+    brightness: 0.15
+    contrast: 0.15
+    hue: 0.05
+    saturation: 0.2
+    blur_prob: 0.3
+    blur_max_sigma: 1.5
+
+model:
+  backbone: "B0"                     # "B0" oder "B4"
+  dropout: 0.3
+
+train:
+  # Phase 1: nur den neuen Kopf trainieren (Backbone eingefroren)
+  head_epochs: 8
+  head_lr: 1.0e-3
+  # Phase 2: Fine-Tuning der oberen Backbone-Layer
+  finetune_epochs: 25
+  finetune_lr: 1.0e-5
+  finetune_unfreeze: 40              # Anzahl der obersten Layer, die aufgetaut werden
+  label_smoothing: 0.05
+  early_stopping_patience: 6
+  monitor: "val_auc"                 # bester Checkpoint nach val-AUC
+  use_class_weight: true             # Class-Imbalance ausgleichen
+
+evaluate:
+  target_sensitivity: 0.95           # Betriebs-Schwellenwert wird darauf kalibriert
+
+export:
+  quantization: "float16"            # "float16" | "int8" | "none"
+  rep_dataset_size: 200              # Kalibrierungs-Samples für int8

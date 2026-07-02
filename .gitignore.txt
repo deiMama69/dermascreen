@@ -1,0 +1,25 @@
+# Virtuelle Umgebungen ausschließen
+.venv/
+venv/
+env/
+Anaconda/
+
+# Datensätze und Bilddaten ausschließen
+data/
+datasets/
+*.zip
+*.tar.gz
+
+# Große Modellgewichte (.pth, .h5, .tflite) ausschließen
+models/
+*.pth
+*.pt
+*.onnx
+*.tflite
+
+# Python- und IDE-Systemdateien
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.vscode/
+.idea/
