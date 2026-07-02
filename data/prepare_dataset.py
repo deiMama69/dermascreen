@@ -30,7 +30,8 @@ def grouped_split(df: pd.DataFrame, cfg: dict[str, Any]):
     group_col = s["group_field"]
 
     # Fehlende patient_id: jede Zeile als eigene Gruppe behandeln (konservativ).
-    groups = df[group_col].fillna("__na__" + df.index.astype(str))
+    fallback = pd.Series("__na__" + df.index.astype(str), index=df.index)
+    groups = df[group_col].astype("object").fillna(fallback)
 
     # 1) Test abtrennen
     gss1 = GroupShuffleSplit(n_splits=1, test_size=s["test_size"],

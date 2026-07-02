@@ -60,7 +60,9 @@ def main() -> None:
     cfg = load_config(args.config)
 
     ckpt = os.path.join(cfg["paths"]["models_dir"], "best_model.keras")
-    model = tf.keras.models.load_model(ckpt, compile=False)
+    # safe_mode=False: erlaubt die Lambda-Schicht (preprocess_input) aus unserem
+    # eigenen, vertrauenswürdigen Checkpoint.
+    model = tf.keras.models.load_model(ckpt, compile=False, safe_mode=False)
 
     test_csv = os.path.join(cfg["paths"]["splits_dir"], "test.csv")
     test_ds = build_dataset(test_csv, cfg, training=False)

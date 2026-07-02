@@ -52,7 +52,9 @@ def main() -> None:
     cfg = load_config(args.config)
 
     ckpt = os.path.join(cfg["paths"]["models_dir"], "best_model.keras")
-    model = tf.keras.models.load_model(ckpt, compile=False)
+    # safe_mode=False: erlaubt die Lambda-Schicht (preprocess_input) aus unserem
+    # eigenen, vertrauenswürdigen Checkpoint.
+    model = tf.keras.models.load_model(ckpt, compile=False, safe_mode=False)
 
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
     quant = cfg["export"]["quantization"].lower()
