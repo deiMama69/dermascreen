@@ -122,7 +122,7 @@ python src\train.py --config config.yaml
 ```
 Es laufen zwei Phasen (erst der neue „Kopf", dann Feinschliff). Während des Trainings
 siehst du pro Epoche Zahlen wie `val_auc` (je näher an 1,0, desto besser). Am Ende
-liegt das beste Modell unter `models\best_model.keras`.
+liegt das beste Modell unter `models\best_model.weights.h5`.
 
 ### Schritt 9 — Qualität prüfen
 ```powershell

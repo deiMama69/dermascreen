@@ -26,6 +26,7 @@ import yaml
 from sklearn.metrics import (confusion_matrix, roc_auc_score, roc_curve)
 
 from dataset import build_dataset
+from model import build_model
 
 
 def load_config(path: str) -> dict[str, Any]:
@@ -59,10 +60,13 @@ def main() -> None:
     args = parser.parse_args()
     cfg = load_config(args.config)
 
-    ckpt = os.path.join(cfg["paths"]["models_dir"], "best_model.keras")
-    # safe_mode=False: erlaubt die Lambda-Schicht (preprocess_input) aus unserem
-    # eigenen, vertrauenswürdigen Checkpoint.
-    model = tf.keras.models.load_model(ckpt, compile=False, safe_mode=False)
+    # Architektur im Code neu bauen und nur die Gewichte laden. Das umgeht den
+    # tf-keras-Bug beim Speichern/Laden der EfficientNet-Normalization-Schicht im
+    # .keras-Vollmodell-Format (die ImageNet-Normalisierungswerte kommen korrekt
+    # aus dem frisch gebauten Backbone).
+    ckpt = os.path.join(cfg["paths"]["models_dir"], "best_model.weights.h5")
+    model = build_model(cfg)
+    model.load_weights(ckpt)
 
     test_csv = os.path.join(cfg["paths"]["splits_dir"], "test.csv")
     test_ds = build_dataset(test_csv, cfg, training=False)

@@ -26,6 +26,7 @@ import tensorflow as tf
 import yaml
 
 from dataset import _decode_image  # gleicher Bild-Decode wie im Training
+from model import build_model
 
 
 def load_config(path: str) -> dict[str, Any]:
@@ -51,10 +52,11 @@ def main() -> None:
     args = parser.parse_args()
     cfg = load_config(args.config)
 
-    ckpt = os.path.join(cfg["paths"]["models_dir"], "best_model.keras")
-    # safe_mode=False: erlaubt die Lambda-Schicht (preprocess_input) aus unserem
-    # eigenen, vertrauenswürdigen Checkpoint.
-    model = tf.keras.models.load_model(ckpt, compile=False, safe_mode=False)
+    # Architektur neu bauen und nur die Gewichte laden (umgeht den EfficientNet-
+    # Normalization-Speicherbug im .keras-Vollmodell-Format).
+    ckpt = os.path.join(cfg["paths"]["models_dir"], "best_model.weights.h5")
+    model = build_model(cfg)
+    model.load_weights(ckpt)
 
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
     quant = cfg["export"]["quantization"].lower()

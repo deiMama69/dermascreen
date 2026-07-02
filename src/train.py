@@ -44,7 +44,7 @@ def _callbacks(cfg: dict[str, Any], ckpt_path: str) -> list:
     return [
         tf.keras.callbacks.ModelCheckpoint(
             ckpt_path, monitor=monitor, mode="max",
-            save_best_only=True, save_weights_only=False, verbose=1),
+            save_best_only=True, save_weights_only=True, verbose=1),
         tf.keras.callbacks.EarlyStopping(
             monitor=monitor, mode="max",
             patience=cfg["train"]["early_stopping_patience"],
@@ -75,7 +75,7 @@ def main() -> None:
 
     model = build_model(cfg)
     os.makedirs(cfg["paths"]["models_dir"], exist_ok=True)
-    ckpt = os.path.join(cfg["paths"]["models_dir"], "best_model.keras")
+    ckpt = os.path.join(cfg["paths"]["models_dir"], "best_model.weights.h5")
 
     # ---- Phase 1: nur Kopf ----
     print("\n=== Phase 1: Kopf-Training (Backbone eingefroren) ===")
