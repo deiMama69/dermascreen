@@ -9,23 +9,26 @@ paths:
   models_dir: "models"               # gespeicherte Keras-/TFLite-Modelle
 
 isic:
-  # Öffentliche ISIC-API (v2). Ein kostenloser Account erhöht das Download-Limit.
+  # PAD-UFES-20 wird über die ISIC-Archive-Collection 406 bezogen: dieselben
+  # klinischen Smartphone-Fotos, aber über einen zuverlässigen, automatisierbaren
+  # Host — inklusive Label (diagnosis_1) und patient_id für den Patienten-Split.
   api_base: "https://api.isic-archive.com/api/v2"
+  collection_id: 406                 # 406 = PAD-UFES-20 (klinische Aufnahmen)
   page_limit: 100                    # Einträge pro API-Seite
-  max_images: 100000                 # Sicherheits-Obergrenze für den Download
-  # Optionaler API-Key/Token (leer lassen für anonymen Zugriff mit Limit)
-  token: ""
+  token: ""                          # optional; leer = anonymer Zugriff
 
 filter:
-  # Fitzpatrick-Hauttypen, die behalten werden (helle Haut).
-  fitzpatrick_keep: ["I", "II", "III"]
-  # Nur klinische Makroaufnahmen behalten – dermatoskopische verwerfen.
-  # ISIC-Feld image_type: "clinical: close-up", "clinical: overview", "dermoscopic"
-  image_type_keep_substring: "clinical"
-  # Feld, das benigne/maligne kodiert.
-  label_field: "benign_malignant"
-  malignant_values: ["malignant"]
-  benign_values: ["benign"]
+  # --- Label: ISIC-Feld diagnosis_1 ("Benign" / "Malignant") ---
+  label_field: "diagnosis_1"
+  malignant_values: ["Malignant"]
+  benign_values: ["Benign"]
+  # "Indeterminate" oder leere Labels werden verworfen.
+  # --- Nur klinische Aufnahmen (in Collection 406 ohnehin alle) ---
+  image_type_field: "image_type"
+  image_type_keep_substring: "clinical"   # verwirft evtl. dermatoskopische Bilder
+  image_id_field: "img_id"           # Dateiname, z. B. ISIC_0601025.jpg
+  # Hinweis: Fitzpatrick ist über die ISIC-API nicht verfügbar. Der Datensatz ist
+  # aber zu ~97 % heller Hauttyp (nur 73 von 2298 Bildern sind Typ IV–VI).
 
 split:
   test_size: 0.15

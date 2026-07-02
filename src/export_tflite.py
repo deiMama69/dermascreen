@@ -88,7 +88,8 @@ def main() -> None:
         "input_size": int(cfg["data"]["img_size"]),
         "operating_threshold": threshold,
         "labels": {"0": "benigne (unauffällig)", "1": "verdächtig / maligne"},
-        "fitzpatrick_scope": cfg["filter"]["fitzpatrick_keep"],
+        "dataset": "PAD-UFES-20 (klinische Fotos, via ISIC-Collection 406)",
+        "skin_type_scope": "vorwiegend heller Hauttyp (Fitzpatrick I–III)",
         "disclaimer": "Kein Medizinprodukt. Keine Diagnose. Nur Forschungs-/Demozweck.",
     }
     meta_path = os.path.join(out_dir, "model_meta.json")

@@ -98,22 +98,23 @@ pip install -r requirements.txt
 ```
 Das lädt TensorFlow & Co. — dauert ein paar Minuten und ~1 GB Download. Einmalig.
 
-### Schritt 7 — Daten holen (ISIC-Bilder)
+### Schritt 7 — Daten holen (PAD-UFES-20 via ISIC-Collection 406)
 Nacheinander ausführen — jeder Befehl erst starten, wenn der vorherige fertig ist:
 ```powershell
-python data\download_isic.py   --config config.yaml
-python data\filter_metadata.py --config config.yaml
-python data\prepare_dataset.py --config config.yaml
+python data\download_isic406.py --config config.yaml
+python data\filter_metadata.py  --config config.yaml
+python data\prepare_dataset.py  --config config.yaml
 ```
-- Der erste Befehl lädt die Metadaten (Beschreibungen aller Bilder).
-- Der zweite filtert auf **helle Haut (Fitzpatrick I–III)** + **klinische Fotos** und
-  lädt nur diese Bilder herunter.
-- Der dritte teilt die Daten sauber in Trainings-, Validierungs- und Testteil.
+- Der erste Befehl lädt die Metadaten **und** alle klinischen Bilder (2298 Smartphone-
+  Fotos) der ISIC-Collection 406 herunter.
+- Der zweite filtert auf **klinische Fotos** und baut das Label (benigne/maligne aus
+  `diagnosis_1`).
+- Der dritte teilt die Daten **patientengetrennt** in Trainings-, Validierungs- und Testteil.
 
 **Schau dir die Ausgabe von Schritt 2 an:** Dort steht, wie viele maligne (bösartige)
-und benigne (gutartige) Bilder übrig bleiben. Sind es sehr wenige maligne (z. B. unter
-~50), ist das Ergebnis später nicht aussagekräftig — dann sag mir Bescheid, dann bauen
-wir eine zusätzliche Datenquelle ein.
+und benigne (gutartige) Bilder übrig bleiben. Hinweis: Fitzpatrick lässt sich über die
+ISIC-API nicht filtern — der Datensatz ist aber zu ~97 % heller Hauttyp (nur 73 von
+2298 Bildern sind Typ IV–VI).
 
 ### Schritt 8 — Training starten
 ```powershell

@@ -18,8 +18,8 @@ in einer **Jetpack-Compose**-App mit On-Device-Inferenz.
 
 | Schritt | Skript | Zweck |
 |--------|--------|-------|
-| 1. Download | `data/download_isic.py` | ISIC-Archiv über REST-API laden (Metadaten + Bilder) |
-| 2. Filterung | `data/filter_metadata.py` | Fitzpatrick I–III **und** klinische Aufnahmen selektieren |
+| 1. Download | `data/download_isic406.py` | PAD-UFES-20 via ISIC-Collection 406 laden (klinische Fotos) |
+| 2. Filterung | `data/filter_metadata.py` | Klinische Aufnahmen + Label (benigne/maligne) selektieren |
 | 3. Split | `data/prepare_dataset.py` | Patienten-getrennter Train/Val/Test-Split (kein Leakage) |
 | 4. Datenpipeline | `src/dataset.py` | `tf.data`-Pipeline inkl. Smartphone-Augmentation |
 | 5. Modell | `src/model.py` | EfficientNet-B0/B4 mit ImageNet-Gewichten |
@@ -36,10 +36,10 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-# 2. Daten holen (benötigt kostenlosen ISIC-Account für vollständigen Zugriff)
-python data/download_isic.py  --config config.yaml
-python data/filter_metadata.py --config config.yaml
-python data/prepare_dataset.py --config config.yaml
+# 2. Daten holen (PAD-UFES-20 via ISIC-Collection 406, kein Account nötig)
+python data/download_isic406.py --config config.yaml
+python data/filter_metadata.py  --config config.yaml
+python data/prepare_dataset.py  --config config.yaml
 
 # 3. Training (GPU empfohlen — siehe notebooks/colab_training.ipynb für Colab)
 python src/train.py --config config.yaml

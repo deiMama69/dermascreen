@@ -20,7 +20,10 @@ AUTOTUNE = tf.data.AUTOTUNE
 
 def _decode_image(path: tf.Tensor, img_size: int) -> tf.Tensor:
     raw = tf.io.read_file(path)
-    img = tf.io.decode_jpeg(raw, channels=3)
+    # decode_image beherrscht PNG (PAD-UFES-20) UND JPG; expand_animations=False
+    # liefert einen 3D-Tensor (H, W, C), damit resize funktioniert.
+    img = tf.io.decode_image(raw, channels=3, expand_animations=False)
+    img.set_shape([None, None, 3])
     img = tf.image.resize(img, (img_size, img_size))
     return img  # float32 in [0, 255]; Normalisierung macht das EfficientNet-Preprocessing
 
